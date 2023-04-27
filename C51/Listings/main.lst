@@ -1,0 +1,58 @@
+C51 COMPILER V9.54   MAIN                                                                  06/18/2021 00:08:38 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*****************************************************
+   2          *@filename:       main.c
+   3          *@description:    实现校园车辆测速并显示
+   4          *@author:         ZhangRun
+   5          *@version：       v1.0
+   6          *@date：          2021/6/17
+   7          *@note: 
+   8          ****************************************************/
+   9          
+  10          #include "reg51.h"
+  11          #include "intrins.h"
+  12          #include "absacc.h"
+  13          #include "lcd128128.h"
+  14          #include "delay.h"
+  15          #include "speed.h"
+  16          
+  17          
+  18          /*****************************************************
+  19          *@param:        
+  20          *@return: 
+  21          *@function: 
+  22          *@author:         ZhangRun
+  23          *@date:           2021/6/17
+  24          *@note: 
+  25          ****************************************************/
+  26          void main()
+  27          {
+  28   1          lcd_init();
+  29   1          speed_init();//HC-SR04初始化
+  30   1          while(1)
+  31   1          {
+  32   2          display();
+  33   2          }
+  34   1      }    
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     11    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

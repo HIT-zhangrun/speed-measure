@@ -1,0 +1,7 @@
+".\Objects\STARTUP.obj",
+".\Objects\main.obj",
+".\Objects\delay.obj",
+".\Objects\lcd128128.obj",
+".\Objects\speed.obj" 
+TO ".\Objects\speedtest" 
+PRINT(".\Listings\speedtest.m51") RAMSIZE(256) 

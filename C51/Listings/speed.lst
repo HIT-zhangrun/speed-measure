@@ -1,0 +1,100 @@
+C51 COMPILER V9.54   SPEED                                                                 06/18/2021 00:08:38 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE SPEED
+OBJECT MODULE PLACED IN .\Objects\speed.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE speed.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\spe
+                    -ed.lst) TABS(2) OBJECT(.\Objects\speed.obj)
+
+line level    source
+
+   1          /*****************************************************
+   2          *@filename:       main.c
+   3          *@description:    测速
+   4          *@author:         ZhangRun
+   5          *@version：       v1.0
+   6          *@date：          2021/6/17
+   7          *@note: 
+   8          ****************************************************/
+   9          #include "speed.h"
+  10          
+  11          int   count           =   0;
+  12          
+  13          float DistanceValue   =   0.0;  //测量的距离值
+  14          float DistanceValue2  =   0.0;
+  15          uint_8 speed;
+  16          float SPEEDSOUND;               //声速
+  17          
+  18          
+  19          /*****************************************************
+  20          *@param:        
+  21          *@return: 
+  22          *@function:       测量距离
+  23          *@author:         ZhangRun
+  24          *@date:           2021/6/17
+  25          *@note: 
+  26          ****************************************************/
+  27          float MeasuringDistance()
+  28          {
+  29   1          TH0=0;        //最大定时时间约65ms
+  30   1          TL0=0;
+  31   1          Trig=1;       //生成20us的脉冲宽度的触发信号
+  32   1          Delay20us();
+  33   1          Trig=0;
+  34   1          while(!Echo); //等待回响信号变高电平
+  35   1          TR0=1;        //启动定时器0
+  36   1          while(Echo);  //等待回响信号变低电平
+  37   1          TR0=0;        //关闭定时器0
+  38   1          return (SPEEDSOUND*(TH0*256.0+TL0))/2000;   //返回距离值(mm)
+  39   1      }
+  40          /*****************************************************
+  41          *@param:        
+  42          *@return: 
+  43          *@function:       HCSR04初始化
+  44          *@author:         ZhangRun
+  45          *@date:           2021/6/17
+  46          *@note: 
+  47          ****************************************************/
+  48          void speed_init()
+  49          {
+  50   1          SPEEDSOUND=334.1+25*0.61;       
+  51   1          Trig=0; 
+  52   1          Echo=0;
+  53   1          TMOD=0x01;
+  54   1      }
+C51 COMPILER V9.54   SPEED                                                                 06/18/2021 00:08:38 PAGE 2   
+
+  55          /*****************************************************
+  56          *@param:        
+  57          *@return: 
+  58          *@function:       测距的数值排序求平均
+  59          *@author:         ZhangRun
+  60          *@date:           2021/6/17
+  61          *@note: 
+  62          ****************************************************/
+  63          float DistanceStatistics()
+  64          {
+  65   1          uint_8 i;
+  66   1          float disData;
+  67   1          for(i=0;i<7;i++)              //连续测距
+  68   1          {
+  69   2            disData+=MeasuringDistance(); 
+  70   2            delay1ms(1);
+  71   2          }
+  72   1          return disData/7.0;
+  73   1      }
+  74          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    181    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     15       5
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

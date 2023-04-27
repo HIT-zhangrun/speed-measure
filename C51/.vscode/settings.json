@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.xdc": "bat",
+        "ABSACC.H": "cpp",
+        "INTRINS.H": "cpp",
+        "reg51.h": "c",
+        "lcd128128.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
+}

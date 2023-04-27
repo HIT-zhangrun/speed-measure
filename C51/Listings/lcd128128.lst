@@ -1,0 +1,517 @@
+C51 COMPILER V9.54   LCD128128                                                             06/18/2021 00:08:38 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE LCD128128
+OBJECT MODULE PLACED IN .\Objects\lcd128128.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE lcd128128.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings
+                    -\lcd128128.lst) TABS(2) OBJECT(.\Objects\lcd128128.obj)
+
+line level    source
+
+   1          /*****************************************************
+   2          *@filename:       lcd128128.c
+   3          *@description:    显示页面控制
+   4          *@author:         ZhangRun
+   5          *@version：       v1.0
+   6          *@date：          2021/6/17
+   7          *@note: 
+   8          ****************************************************/
+   9          #include "lcd128128.h"
+  10          #include "zimo.h"
+  11          
+  12          
+  13          uint_16   lcdadress;            //lcd地址
+  14          uint_8    lcdh,lcdl;            //lcd地址高低
+  15          
+  16          /*****************************************************
+  17          *@param:        
+  18          *@return: 
+  19          *@function:       LCD初始化
+  20          *@author:         ZhangRun
+  21          *@date:           2021/6/17
+  22          *@note: 
+  23          ****************************************************/
+  24          void busycheck()
+  25          {
+  26   1          uint_8 state;
+  27   1          P0=0XFF;
+  28   1          do
+  29   1          {
+  30   2            cd=1;                     // 选择指令通道，准备读取通道状态
+  31   2            rd=0;                     //读有效
+  32   2            state=P0;
+  33   2            rd=1;
+  34   2          }
+  35   1          while((state&0x03)!=0x03);
+  36   1      }
+  37          
+  38          /*****************************************************
+  39          *@param:        
+  40          *@return: 
+  41          *@function:       LCD初始化
+  42          *@author:         ZhangRun
+  43          *@date:           2021/6/17
+  44          *@note: 
+  45          ****************************************************/
+  46          void setadr(void)                 //设定地址子程序
+  47          {
+  48   1         lcdh=lcdadress/256;
+  49   1         lcdl=lcdadress-lcdh*256;
+  50   1         wrcode2(lcdl,lcdh,0x24);
+  51   1      }
+  52          
+  53          /*****************************************************
+  54          *@param:        
+C51 COMPILER V9.54   LCD128128                                                             06/18/2021 00:08:38 PAGE 2   
+
+  55          *@return: 
+  56          *@function:       LCD初始化
+  57          *@author:         ZhangRun
+  58          *@date:           2021/6/17
+  59          *@note: 
+  60          ****************************************************/
+  61          void wrcode0(uint_8 h)            //无参数指令写入子程序
+  62          {
+  63   1          busycheck();
+  64   1          cd=1;                         //选择指令通道
+  65   1          P0=h;
+  66   1          wr=0;
+  67   1          wr=1;
+  68   1      }
+  69          
+  70          /*****************************************************
+  71          *@param:        
+  72          *@return: 
+  73          *@function:       LCD初始化
+  74          *@author:         ZhangRun
+  75          *@date:           2021/6/17
+  76          *@note: 
+  77          ****************************************************/
+  78          void wrcode1(uint_8 i,uint_8 h)   //单参数指令写入子程序
+  79          {  
+  80   1         wrdata(i);
+  81   1         wrcode0(h);
+  82   1      }
+  83          
+  84          /*****************************************************
+  85          *@param:        
+  86          *@return: 
+  87          *@function:       LCD初始化
+  88          *@author:         ZhangRun
+  89          *@date:           2021/6/17
+  90          *@note: 
+  91          ****************************************************/
+  92          void wrcode2(uint_8 i,uint_8 j,uint_8 h)//双参数指令写入子程序
+  93          {
+  94   1          wrdata(i);                          //第一个参数写入
+  95   1          wrdata(j);                          //第二个参数写入
+  96   1          wrcode0(h);
+  97   1      }
+  98          
+  99          /*****************************************************
+ 100          *@param:        
+ 101          *@return: 
+ 102          *@function:       LCD初始化
+ 103          *@author:         ZhangRun
+ 104          *@date:           2021/6/17
+ 105          *@note: 
+ 106          ****************************************************/
+ 107          void wrdata(uint_8 j)
+ 108          {
+ 109   1          busycheck();
+ 110   1          cd=0;                               //选择数据通道
+ 111   1          P0=j;
+ 112   1          wr=0;
+ 113   1          wr=1;
+ 114   1      }
+ 115          
+ 116          /*****************************************************
+C51 COMPILER V9.54   LCD128128                                                             06/18/2021 00:08:38 PAGE 3   
+
+ 117          *@param:        
+ 118          *@return: 
+ 119          *@function:       LCD初始化
+ 120          *@author:         ZhangRun
+ 121          *@date:           2021/6/17
+ 122          *@note: 
+ 123          ****************************************************/
+ 124          void disptupian(uint_8 *p,uint_8 x,uint_8 y,uint_8 base,uint_8 pianyi)
+ 125          {
+ 126   1          int i,j;
+ 127   1          for(i=0;i<y;i++)
+ 128   1          {
+ 129   2            lcdadress=base*30+pianyi+i*30+0x0800;
+ 130   2            setadr();
+ 131   2            for(j=0;j<x;j++)
+ 132   2            {
+ 133   3              wrcode1(*p,0xc0);
+ 134   3              p++;
+ 135   3            }
+ 136   2          }
+ 137   1      }
+ 138          
+ 139          /*****************************************************
+ 140          *@param:        
+ 141          *@return: 
+ 142          *@function:       LCD初始化
+ 143          *@author:         ZhangRun
+ 144          *@date:           2021/6/17
+ 145          *@note: 
+ 146          ****************************************************/
+ 147          void lcd_init()//LCD初始化
+ 148          {     
+ 149   1          uint_16 i;
+ 150   1          wrcode2(0x04,0x00,0x22);
+ 151   1          wrcode2(0x00,0x00,0x40);    //文本区首地址设置（D1,D2,40H），0X0000
+ 152   1          wrcode2(0x1e,0x00,0x41);    //文本区宽度设置（D1,D2,41H），16字节每行
+ 153   1          wrcode2(0x00,0x08,0x42);    //图形区首地址设置（D1,D2,42H)，0x0800
+ 154   1          wrcode2(0x1e,0x00,0x43);    //图形区宽度(D1,D2,43H),30字节每行
+ 155   1          wrcode0(0x80);              //显示方式设置，内部字符发生器有效，逻辑或合成
+ 156   1          wrcode0(0x9c);              //显示开关指令，
+ 157   1          wrcode0(0xa3);              //光标形状选择，8点*7行
+ 158   1          wrcode2(0x00,0x08,0x24);    //移地址指针(D1,D2,24H),清图形区
+ 159   1          wrcode0(0xb0);              //自动写设置,准备清零
+ 160   1          for(i=0;i<2048;i++)         //128*128共2048个字节，清屏
+ 161   1          {
+ 162   2          wrdata(0x00);
+ 163   2          }
+ 164   1          wrcode0(0xb2);
+ 165   1      } 
+ 166          
+ 167          void display()
+ 168          {
+ 169   1          DistanceValue= DistanceStatistics();
+ 170   1          disptupian(HIT,16,128,0,0); 
+ 171   1          delay1ms(1000);
+ 172   1          disptupian(tupian,16,128,0,0); //清空
+ 173   1          disptupian(jiansu,16,32,0,0); 
+ 174   1          disptupian(xiansu,16,96,32,0);  
+ 175   1          delay1ms(1000);
+ 176   1          disptupian(tupian,16,128,0,0); //清空
+ 177   1          DistanceValue2=DistanceStatistics();
+ 178   1          speed=(int)((DistanceValue2-DistanceValue)/115);
+C51 COMPILER V9.54   LCD128128                                                             06/18/2021 00:08:38 PAGE 4   
+
+ 179   1          disptupian(nindesudu,16,32,0,0);
+ 180   1          switch(speed)
+ 181   1          {
+ 182   2            case  0:  
+ 183   2              disptupian(shu0,8,96,32,8);break;
+ 184   2            case  1:  
+ 185   2              disptupian(shu1,8,96,32,8);break;
+ 186   2            case  2:  
+ 187   2              disptupian(shu2,8,96,32,8);break;
+ 188   2            case  3:  
+ 189   2              disptupian(shu3,8,96,32,8);break;
+ 190   2            case  4:  
+ 191   2              disptupian(shu4,8,96,32,8);break;
+ 192   2            case  5:  
+ 193   2              disptupian(shu5,8,96,32,8);break;
+ 194   2            case  6:  
+ 195   2              disptupian(shu6,8,96,32,8);break;
+ 196   2            case  7:  
+ 197   2              disptupian(shu7,8,96,32,8);break;
+ 198   2            case  8:  
+ 199   2              disptupian(shu8,8,96,32,8);break;
+ 200   2            case  9:  
+ 201   2              disptupian(shu9,8,96,32,8);break;
+ 202   2            case  10: 
+ 203   2              disptupian(shu1,8,96,32,0);
+ 204   2              disptupian(shu0,8,96,32,8);break;
+ 205   2            case  11: 
+ 206   2              disptupian(shu1,8,96,32,0);
+ 207   2              disptupian(shu1,8,96,32,8);break;
+ 208   2            case  12: 
+ 209   2              disptupian(shu1,8,96,32,0);
+ 210   2              disptupian(shu2,8,96,32,8);break;
+ 211   2            case  13: 
+ 212   2              disptupian(shu1,8,96,32,0);
+ 213   2              disptupian(shu3,8,96,32,8);break;
+ 214   2            case  14: 
+ 215   2              disptupian(shu1,8,96,32,0);
+ 216   2              disptupian(shu4,8,96,32,8);break;
+ 217   2            case  15: 
+ 218   2              disptupian(shu1,8,96,32,0);
+ 219   2              disptupian(shu5,8,96,32,8);break;
+ 220   2            case  16: 
+ 221   2              disptupian(shu1,8,96,32,0);
+ 222   2              disptupian(shu6,8,96,32,8);break;
+ 223   2            case  17: 
+ 224   2              disptupian(shu1,8,96,32,0);
+ 225   2              disptupian(shu7,8,96,32,8);break;
+ 226   2            case  18: 
+ 227   2              disptupian(shu1,8,96,32,0);
+ 228   2              disptupian(shu8,8,96,32,8);break;
+ 229   2            case  19: 
+ 230   2              disptupian(shu1,8,96,32,0);
+ 231   2              disptupian(shu9,8,96,32,8);break;
+ 232   2            case  20: 
+ 233   2              disptupian(shu2,8,96,32,0);
+ 234   2              disptupian(shu0,8,96,32,8);break;
+ 235   2            case  21: 
+ 236   2              disptupian(shu2,8,96,32,0);
+ 237   2              disptupian(shu1,8,96,32,8);break;
+ 238   2            case  22: 
+ 239   2              disptupian(shu2,8,96,32,0);
+ 240   2              disptupian(shu2,8,96,32,8);break;
+C51 COMPILER V9.54   LCD128128                                                             06/18/2021 00:08:38 PAGE 5   
+
+ 241   2            case  23: 
+ 242   2              disptupian(shu2,8,96,32,0);
+ 243   2              disptupian(shu3,8,96,32,8);break;
+ 244   2            case  24: 
+ 245   2              disptupian(shu2,8,96,32,0);
+ 246   2              disptupian(shu4,8,96,32,8);break;
+ 247   2            case  25: 
+ 248   2              disptupian(shu2,8,96,32,0);
+ 249   2              disptupian(shu5,8,96,32,8);break;
+ 250   2            case  26: 
+ 251   2              disptupian(shu2,8,96,32,0);
+ 252   2              disptupian(shu6,8,96,32,8);break;
+ 253   2            case  27: 
+ 254   2              disptupian(shu2,8,96,32,0);
+ 255   2              disptupian(shu7,8,96,32,8);break;
+ 256   2            case  28: 
+ 257   2              disptupian(shu2,8,96,32,0);
+ 258   2              disptupian(shu8,8,96,32,8);break;
+ 259   2            case  29: 
+ 260   2              disptupian(shu2,8,96,32,0);
+ 261   2              disptupian(shu9,8,96,32,8);break;
+ 262   2            case  30: 
+ 263   2              disptupian(shu3,8,96,32,0);
+ 264   2              disptupian(shu0,8,96,32,8);break;
+ 265   2            case  31: 
+ 266   2              disptupian(shu3,8,96,32,0);
+ 267   2              disptupian(shu1,8,96,32,8);break;
+ 268   2            case  32: 
+ 269   2              disptupian(shu3,8,96,32,0);
+ 270   2              disptupian(shu2,8,96,32,8);break;
+ 271   2            case  33: 
+ 272   2              disptupian(shu3,8,96,32,0);
+ 273   2              disptupian(shu3,8,96,32,8);break;
+ 274   2            case  34: 
+ 275   2              disptupian(shu3,8,96,32,0);
+ 276   2              disptupian(shu4,8,96,32,8);break;
+ 277   2            case  35: 
+ 278   2              disptupian(shu3,8,96,32,0);
+ 279   2              disptupian(shu5,8,96,32,8);break;
+ 280   2            case  36: 
+ 281   2              disptupian(shu3,8,96,32,0);
+ 282   2              disptupian(shu6,8,96,32,8);break;
+ 283   2            case  37: 
+ 284   2              disptupian(shu3,8,96,32,0);
+ 285   2              disptupian(shu7,8,96,32,8);break;
+ 286   2            case  38: 
+ 287   2              disptupian(shu3,8,96,32,0);
+ 288   2              disptupian(shu8,8,96,32,8);break;
+ 289   2            case  39: 
+ 290   2              disptupian(shu3,8,96,32,0);
+ 291   2              disptupian(shu9,8,96,32,8);break;
+ 292   2            case  40: 
+ 293   2              disptupian(shu4,8,96,32,0);
+ 294   2              disptupian(shu0,8,96,32,8);break;
+ 295   2            case  41: 
+ 296   2              disptupian(shu4,8,96,32,0);
+ 297   2              disptupian(shu1,8,96,32,8);break;
+ 298   2            case  42: 
+ 299   2              disptupian(shu4,8,96,32,0);
+ 300   2              disptupian(shu2,8,96,32,8);break;
+ 301   2            case  43: 
+ 302   2              disptupian(shu4,8,96,32,0);
+C51 COMPILER V9.54   LCD128128                                                             06/18/2021 00:08:38 PAGE 6   
+
+ 303   2              disptupian(shu3,8,96,32,8);break;
+ 304   2            case  44: 
+ 305   2              disptupian(shu4,8,96,32,0);
+ 306   2              disptupian(shu4,8,96,32,8);break;
+ 307   2            case  45: 
+ 308   2              disptupian(shu4,8,96,32,0);
+ 309   2              disptupian(shu5,8,96,32,8);break;
+ 310   2            case  46: 
+ 311   2              disptupian(shu4,8,96,32,0);
+ 312   2              disptupian(shu6,8,96,32,8);break;
+ 313   2            case  47: 
+ 314   2              disptupian(shu4,8,96,32,0);
+ 315   2              disptupian(shu7,8,96,32,8);break;
+ 316   2            case  48: 
+ 317   2              disptupian(shu4,8,96,32,0);
+ 318   2              disptupian(shu8,8,96,32,8);break;
+ 319   2            case  49: 
+ 320   2              disptupian(shu4,8,96,32,0);
+ 321   2              disptupian(shu9,8,96,32,8);break;
+ 322   2            case  50: 
+ 323   2              disptupian(shu5,8,96,32,0);
+ 324   2              disptupian(shu0,8,96,32,8);break;
+ 325   2            case  51: 
+ 326   2              disptupian(shu5,8,96,32,0);
+ 327   2              disptupian(shu1,8,96,32,8);break;
+ 328   2            case  52: 
+ 329   2              disptupian(shu5,8,96,32,0);
+ 330   2              disptupian(shu2,8,96,32,8);break;
+ 331   2            case  53: 
+ 332   2              disptupian(shu5,8,96,32,0);
+ 333   2              disptupian(shu3,8,96,32,8);break;
+ 334   2            case  54: 
+ 335   2              disptupian(shu5,8,96,32,0);
+ 336   2              disptupian(shu4,8,96,32,8);break;
+ 337   2            case  55: 
+ 338   2              disptupian(shu5,8,96,32,0);
+ 339   2              disptupian(shu5,8,96,32,8);break;
+ 340   2            case  56: 
+ 341   2              disptupian(shu5,8,96,32,0);
+ 342   2              disptupian(shu6,8,96,32,8);break;
+ 343   2            case  57: 
+ 344   2              disptupian(shu5,8,96,32,0);
+ 345   2              disptupian(shu7,8,96,32,8);break;
+ 346   2            case  58: 
+ 347   2              disptupian(shu5,8,96,32,0);
+ 348   2              disptupian(shu8,8,96,32,8);break;
+ 349   2            case  59: 
+ 350   2              disptupian(shu5,8,96,32,0);
+ 351   2              disptupian(shu9,8,96,32,8);break;
+ 352   2            case  60: 
+ 353   2              disptupian(shu6,8,96,32,0);
+ 354   2              disptupian(shu0,8,96,32,8);break;
+ 355   2            case  61: 
+ 356   2              disptupian(shu6,8,96,32,0);
+ 357   2              disptupian(shu1,8,96,32,8);break;
+ 358   2            case  62: 
+ 359   2              disptupian(shu6,8,96,32,0);
+ 360   2              disptupian(shu2,8,96,32,8);break;
+ 361   2            case  63: 
+ 362   2              disptupian(shu6,8,96,32,0);
+ 363   2              disptupian(shu3,8,96,32,8);break;
+ 364   2            case  64: 
+C51 COMPILER V9.54   LCD128128                                                             06/18/2021 00:08:38 PAGE 7   
+
+ 365   2              disptupian(shu6,8,96,32,0);
+ 366   2              disptupian(shu4,8,96,32,8);break;
+ 367   2            case  65: 
+ 368   2              disptupian(shu6,8,96,32,0);
+ 369   2              disptupian(shu5,8,96,32,8);break;
+ 370   2            case  66: 
+ 371   2              disptupian(shu6,8,96,32,0);
+ 372   2              disptupian(shu6,8,96,32,8);break;
+ 373   2            case  67: 
+ 374   2              disptupian(shu6,8,96,32,0);
+ 375   2              disptupian(shu7,8,96,32,8);break;
+ 376   2            case  68: 
+ 377   2              disptupian(shu6,8,96,32,0);
+ 378   2              disptupian(shu8,8,96,32,8);break;
+ 379   2            case  69: 
+ 380   2              disptupian(shu6,8,96,32,0);
+ 381   2              disptupian(shu9,8,96,32,8);break;
+ 382   2            case  70: 
+ 383   2              disptupian(shu7,8,96,32,0);
+ 384   2              disptupian(shu0,8,96,32,8);break;
+ 385   2            case  71: 
+ 386   2              disptupian(shu7,8,96,32,0);
+ 387   2              disptupian(shu1,8,96,32,8);break;
+ 388   2            case  72: 
+ 389   2              disptupian(shu7,8,96,32,0);
+ 390   2              disptupian(shu2,8,96,32,8);break;
+ 391   2            case  73: 
+ 392   2              disptupian(shu7,8,96,32,0);
+ 393   2              disptupian(shu3,8,96,32,8);break;
+ 394   2            case  74: 
+ 395   2              disptupian(shu7,8,96,32,0);
+ 396   2              disptupian(shu4,8,96,32,8);break;
+ 397   2            case  75: 
+ 398   2              disptupian(shu7,8,96,32,0);
+ 399   2              disptupian(shu5,8,96,32,8);break;
+ 400   2            case  76: 
+ 401   2              disptupian(shu7,8,96,32,0);
+ 402   2              disptupian(shu6,8,96,32,8);break;
+ 403   2            case  77: 
+ 404   2              disptupian(shu7,8,96,32,0);
+ 405   2              disptupian(shu7,8,96,32,8);break;
+ 406   2            case  78: 
+ 407   2              disptupian(shu7,8,96,32,0);
+ 408   2              disptupian(shu8,8,96,32,8);break;
+ 409   2            case  79: 
+ 410   2              disptupian(shu7,8,96,32,0);
+ 411   2              disptupian(shu9,8,96,32,8);break;
+ 412   2            case  80: 
+ 413   2              disptupian(shu8,8,96,32,0);
+ 414   2              disptupian(shu0,8,96,32,8);break;
+ 415   2            case  81: 
+ 416   2              disptupian(shu8,8,96,32,0);
+ 417   2              disptupian(shu1,8,96,32,8);break;
+ 418   2            case  82: 
+ 419   2              disptupian(shu8,8,96,32,0);
+ 420   2              disptupian(shu2,8,96,32,8);break;
+ 421   2            case  83: 
+ 422   2              disptupian(shu8,8,96,32,0);
+ 423   2              disptupian(shu3,8,96,32,8);break;
+ 424   2            case  84: 
+ 425   2              disptupian(shu8,8,96,32,0);
+ 426   2              disptupian(shu4,8,96,32,8);break;
+C51 COMPILER V9.54   LCD128128                                                             06/18/2021 00:08:38 PAGE 8   
+
+ 427   2            case  85: 
+ 428   2              disptupian(shu8,8,96,32,0);
+ 429   2              disptupian(shu5,8,96,32,8);break;
+ 430   2            case  86: 
+ 431   2              disptupian(shu8,8,96,32,0);
+ 432   2              disptupian(shu6,8,96,32,8);break;
+ 433   2            case  87: 
+ 434   2              disptupian(shu8,8,96,32,0);
+ 435   2              disptupian(shu7,8,96,32,8);break;
+ 436   2            case  88: 
+ 437   2              disptupian(shu8,8,96,32,0);
+ 438   2              disptupian(shu8,8,96,32,8);break;
+ 439   2            case  89: 
+ 440   2              disptupian(shu8,8,96,32,0);
+ 441   2              disptupian(shu9,8,96,32,8);break;
+ 442   2            case  90: 
+ 443   2              disptupian(shu9,8,96,32,0);
+ 444   2              disptupian(shu0,8,96,32,8);break;
+ 445   2            case  91: 
+ 446   2              disptupian(shu9,8,96,32,0);
+ 447   2              disptupian(shu1,8,96,32,8);break;
+ 448   2            case  92: 
+ 449   2              disptupian(shu9,8,96,32,0);
+ 450   2              disptupian(shu2,8,96,32,8);break;
+ 451   2            case  93: 
+ 452   2              disptupian(shu9,8,96,32,0);
+ 453   2              disptupian(shu3,8,96,32,8);break;
+ 454   2            case  94: 
+ 455   2              disptupian(shu9,8,96,32,0);
+ 456   2              disptupian(shu4,8,96,32,8);break;
+ 457   2            case  95: 
+ 458   2              disptupian(shu9,8,96,32,0);
+ 459   2              disptupian(shu5,8,96,32,8);break;
+ 460   2            case  96: 
+ 461   2              disptupian(shu9,8,96,32,0);
+ 462   2              disptupian(shu6,8,96,32,8);break;
+ 463   2            case  97: 
+ 464   2              disptupian(shu9,8,96,32,0);
+ 465   2              disptupian(shu7,8,96,32,8);break;
+ 466   2            case  98: 
+ 467   2              disptupian(shu9,8,96,32,0);
+ 468   2              disptupian(shu8,8,96,32,8);break;
+ 469   2            case  99: 
+ 470   2              disptupian(shu9,8,96,32,0);
+ 471   2              disptupian(shu9,8,96,32,8);break;
+ 472   2            default:
+ 473   2              disptupian(shu1,8,96,32,0);
+ 474   2              disptupian(shu9,8,96,32,8);break;
+ 475   2              }
+ 476   1            delay1ms(2000);
+ 477   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1974    ----
+   CONSTANT SIZE    =  14464    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4      14
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.54   LCD128128                                                             06/18/2021 00:08:38 PAGE 9   
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

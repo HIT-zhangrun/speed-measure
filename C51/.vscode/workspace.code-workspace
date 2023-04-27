@@ -1,0 +1,10 @@
+{
+	"folders": [],
+	"settings": {
+		"files.associations": {
+			"*.xdc": "ucf",
+			"tcp_test.h": "c",
+			"libwnb.h": "c"
+		}
+	}
+}
